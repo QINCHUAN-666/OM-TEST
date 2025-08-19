@@ -1,0 +1,2244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OM系列手机适配查询工具</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --light-bg: #f1f5f9;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+        
+        .search-container {
+            background-color: #ffffff;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #334155;
+        }
+        
+        .input-container {
+            position: relative;
+        }
+        
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            background-color: #fff;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        
+        .search-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .search-btn:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #cbd5e1;
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #fff;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            box-shadow: var(--box-shadow);
+            display: none;
+        }
+        
+        .autocomplete-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            color: #334155;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        
+        .autocomplete-item:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .result-container {
+            background-color: #ffffff;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            display: none;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .result-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #334155;
+        }
+        
+        .compatibility-result {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .compatibility-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .compatibility-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .compatibility-description {
+            color: #475569;
+            margin-bottom: 15px;
+        }
+        
+        .success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success-color);
+        }
+        
+        .warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border: 2px solid var(--warning-color);
+        }
+        
+        .danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--danger-color);
+        }
+        
+        .info {
+            background-color: rgba(59, 130, 246, 0.1);
+            border: 2px solid var(--info-color);
+        }
+        
+        .parameters-container {
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .parameters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .parameters-title {
+            font-weight: 600;
+            color: #334155;
+        }
+        
+        .copy-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .parameters-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .parameter-item {
+            background-color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .parameter-label {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+        
+        .parameter-value {
+            font-weight: 600;
+            color: #334155;
+        }
+        
+        .notes-container {
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .notes-title {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 10px;
+        }
+        
+        .notes-content {
+            color: #475569;
+            line-height: 1.6;
+        }
+        
+        .agent-notes {
+            margin-top: 25px;
+        }
+        
+        .agent-notes-title {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 10px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            resize: vertical;
+        }
+.scripts-container {
+    background-color: var(--light-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.scripts-title {
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.script-item {
+    background-color: #fff;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.script-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.script-header input[type="checkbox"] {
+    margin: 0;
+}
+
+.script-header label {
+    flex: 1;
+    margin: 0;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.copy-script-btn {
+    background-color: var(--info-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.copy-script-btn:hover {
+    background-color: #2563eb;
+}
+
+.script-content {
+    background-color: #f8fafc;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #475569;
+    border-left: 3px solid var(--info-color);
+}
+
+.green-check {
+    background-color: rgba(16, 185, 129, 0.1);
+    border: 2px solid var(--success-color);
+}
+
+.yellow-check {
+    background-color: rgba(245, 158, 11, 0.1);
+    border: 2px solid var(--warning-color);
+}
+
+.yellow-cross {
+    background-color: rgba(245, 158, 11, 0.1);
+    border: 2px solid var(--warning-color);
+}
+
+.red-cross {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 2px solid var(--danger-color);
+}
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OM系列手机适配查询工具</h1>
+            <p class="subtitle">快速查询OM系列云台与手机兼容性</p>
+        </header>
+        
+        <div class="search-container">
+            <div class="form-group">
+                <label for="drone-input">OM型号</label>
+                <div class="input-container">
+                    <input type="text" id="drone-input" placeholder="输入云台型号，如Osmo Mobile 6">
+                    <div class="autocomplete-items" id="drone-autocomplete"></div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="brand-select">手机品牌</label>
+                <select id="brand-select">
+                    <option value="">-- 请选择手机品牌 --</option>
+                <option value="Apple">Apple</option>
+                <option value="Huawei">Huawei</option>
+                <option value="Honor">Honor</option>
+                <option value="Samsung">Samsung</option>
+                <option value="Xiaomi">Xiaomi</option>
+                <option value="OPPO">OPPO</option>
+                <option value="VIVO">VIVO</option>
+                <option value="OnePlus">OnePlus</option>
+                <option value="Google">Google</option>
+                <option value="Realme">Realme</option>
+                <option value="LG">LG</option>
+                <option value="Meizu">Meizu</option>
+                <option value="Nothing">Nothing</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone-input">手机型号</label>
+                <div class="input-container">
+                    <input type="text" id="phone-input" placeholder="输入手机型号，如iPhone 15 Pro">
+                    <div class="autocomplete-items" id="phone-autocomplete"></div>
+                </div>
+            </div>
+            
+            <button class="search-btn" id="search-btn">查询适配性</button>
+        </div>
+        
+        <div class="result-container" id="result-container">
+            <div class="result-header">
+                <div class="result-title">适配结果</div>
+            </div>
+            
+            <div class="compatibility-result" id="compatibility-result">
+                <div class="compatibility-icon">✅</div>
+                <div class="compatibility-text">适配</div>
+                <div class="compatibility-description">该手机已在兼容列表内，可保证正常使用</div>
+            </div>
+            
+            <div class="parameters-container" id="parameters-container">
+                <div class="parameters-header">
+                    <div class="parameters-title">硬件兼容参数要求</div>
+<button class="copy-btn" id="copy-btn" onclick="copyParameters()">复制参数</button>
+                </div>
+                <div class="parameters-list">
+                    <div class="parameter-item">
+                        <div class="parameter-label">手机宽度</div>
+                        <div class="parameter-value" id="width-value">67-84mm</div>
+                    </div>
+                    <div class="parameter-item">
+                        <div class="parameter-label">手机厚度</div>
+                        <div class="parameter-value" id="thickness-value">≤10mm</div>
+                    </div>
+                    <div class="parameter-item">
+                        <div class="parameter-label">手机重量</div>
+                        <div class="parameter-value" id="weight-value">≤230g</div>
+                    </div>
+                    <div class="parameter-item">
+                        <div class="parameter-label">夹持范围</div>
+                        <div class="parameter-value" id="clamp-value">70-85mm</div>
+                    </div>
+                </div>
+            </div>
+<div class="scripts-container" id="scripts-container" style="display: none;">
+    <div class="scripts-title">参考话术</div>
+    
+    <div class="script-item">
+        <div class="script-header">
+            <input type="checkbox" id="script1">
+            <label for="script1">客户咨询兼容性效果：参考口径一</label>
+            <button class="copy-script-btn" onclick="copyScript('script1-content')">复制</button>
+        </div>
+        <div class="script-content" id="script1-content"></div>
+    </div>
+    
+    <div class="script-item">
+        <div class="script-header">
+            <input type="checkbox" id="script2">
+            <label for="script2">客户追问具体使用效果：参考口径二</label>
+            <button class="copy-script-btn" onclick="copyScript('script2-content')">复制</button>
+        </div>
+        <div class="script-content" id="script2-content"></div>
+    </div>
+    
+    <div class="script-item">
+        <div class="script-header">
+            <input type="checkbox" id="script3">
+            <label for="script3">客户追问具体兼容时间：参考口径三</label>
+            <button class="copy-script-btn" onclick="copyScript('script3-content')">复制</button>
+        </div>
+        <div class="script-content" id="script3-content"></div>
+    </div>
+</div>
+            <div class="notes-container" id="notes-container">
+                <div class="notes-title">注意事项</div>
+                <div class="notes-content" id="notes-content">
+                    使用带保护壳的手机时，请确保保护壳厚度不超过2mm且无突出部分。对于曲面屏手机，夹持位置应在平面区域以确保稳定性。
+                </div>
+            </div>
+            
+
+    <script>
+
+        const droneModels = [
+            "Osmo Mobile 3", "DJI OM 4", "DJI OM 4 SE", 
+            "DJI OM 5", "Osmo Mobile SE", "Osmo Mobile 6", 
+            "Osmo Mobile 7/7P"
+        ];
+        
+
+        const phoneModels = {
+            "Apple": [
+"iPhone 16 Pro Max",
+"iPhone 16 Pro",
+"iPhone 16 Plus",
+"iPhone 16",
+"iPhone 15 Pro Max",
+"iPhone 15 Pro",
+"iPhone 15 Plus",
+"iPhone 15",
+"iPhone 14 Pro Max",
+"iPhone 14 Pro",
+"iPhone 14 Plus",
+"iPhone 14",
+"iPhone 13 Pro Max",
+"iPhone 13 Pro",
+"iPhone 13 Mini",
+"iPhone 13",
+"iPhone 12 Pro Max",
+"iPhone 12 Pro",
+"iPhone 12",
+"iPhone 12 Mini",
+"iPhone 11 Pro Max",
+"iPhone 11 Pro",
+"iPhone 11",
+"iPhone XS Max",
+"iPhone XS",
+"iPhone X",
+"iPhone XR",
+"iPhone 8 Plus",
+"iPhone 8",
+"iPhone 7 Plus",
+"iPhone 7",
+"iPhone 6S Plus",
+"iPhone 6S",
+"iPhone 6",
+"iPhone SE 2",
+"iPhone SE"
+            ],
+
+            "Huawei": [
+"Mate 70 Pro+",
+"Mate 70 RS 非凡大师",
+"Mate 70",
+"Mate 60 Pro+",
+"Mate 60 Pro",
+"Mate 60",
+"Mate 50 Pro",
+"Mate 50",
+"Mate 40 Pro+",
+"Mate 40 Pro",
+"Mate 40 RS（porsche-design）",
+"Mate 40E",
+"Mate 40",
+"Mate 30 Pro",
+"Mate 30E Pro",
+"Mate 30",
+"Mate 20 Pro",
+"Mate 20 X",
+"Mate 20",
+"Mate 10 Pro",
+"Mate 10",
+"Mate 9 Pro",
+"Mate 9",
+"Mate X2",
+"P70 Ultra",
+"P70 Pro",
+"P70",
+"P60 Pro",
+"P60",
+"P50 Pro",
+"P50E",
+"P50",
+"P40 Pro+",
+"P40 Pro",
+"P40",
+"P30 Pro",
+"P30 lite",
+"P30",
+"P20 Pro",
+"P20",
+"P9",
+"Nova 12 Pro",
+"Nova 10 Pro",
+"Nova 9 Pro",
+"Nova 9",
+"Nova 8 Pro",
+"Nova 8",
+"Nova 7 Pro",
+"Nova 7",
+"Nova 7 SE",
+"Nova 6",
+"Nova 5 Pro",
+"Nova 5",
+"Nova 4",
+"畅享 20 Pro",
+"畅享 20e"
+            ],
+
+            "Google": [
+"Pixel 9 Pro XL",
+"Pixel 9",
+"Pixel 8 Pro",
+"Pixel 8",
+"Pixel 7 Pro",
+"Pixel 7",
+"Pixel 6 Pro",
+"Pixel 6",
+"Pixel 5",
+"Pixel 4XL",
+"Pixel 4A",
+"Pixel 4",
+"Pixel 3 XL"
+            ],
+
+            "Honor": [
+"300 Pro",
+"200 Pro",
+"100 Pro",
+"90 Pro",
+"80 Pro",
+"70 Pro",
+"60 Pro",
+"60",
+"50 Pro",
+"50 SE",
+"50",
+"30 Pro",
+"30",
+"20 Pro",
+"20",
+"10",
+"Magic 7 Pro",
+"Magic 6 Pro",
+"Magic 5 Pro",
+"Magic 4 Pro",
+"Magic 4",
+"Magic 3 Pro",
+"Magic 3",
+"Magic 2",
+"Honor V40",
+"Honor V30 Pro",
+"Honor V30",
+"Honor V20",
+"Honor X30",
+"Honor X10",
+"Honor 9X",
+"Honor 8X"
+            ],
+
+            "LG": [
+"G8X ThinQ",
+"V60 ThinQ"
+            ],
+
+            "Meizu": [
+"meizu 18"
+            ],
+
+            "OnePlus": [
+"OnePlus 13",
+"OnePlus 12",
+"OnePlus 11",
+"OnePlus 10 Pro",
+"OnePlus 9 Pro",
+"OnePlus 9 RT",
+"OnePlus 8 Pro",
+"OnePlus 8T",
+"OnePlus 8",
+"OnePlus 7 Pro",
+"OnePlus 7T",
+"OnePlus 6T"
+            ],
+
+            "OPPO": [
+"Reno 12 Pro",
+"Reno 11 Pro",
+"Reno 10 Pro",
+"Reno 9",
+"Reno 8 Pro",
+"Reno 8",
+"Reno 7 Pro",
+"Reno 7",
+"Reno 6 Pro+",
+"Reno 6 Pro",
+"Reno 6",
+"Reno 5 Pro+",
+"Reno 5 Pro",
+"Reno 5",
+"Reno 4 Pro",
+"Reno 4 SE 5G",
+"Reno 3 Pro",
+"Reno 2",
+"Reno",
+"Reno ACE",
+"Find X8 Ultra",
+"Find X8 S+",
+"Find X8 S",
+"Find X8 Pro",
+"Find X8",
+"Find X7 Ultra",
+"Find X7",
+"Find X6 Pro",
+"Find X6",
+"Find X5 Pro",
+"Find X3 Pro",
+"Find X3",
+"Find X2 Pro",
+"Find X",
+"R17 Pro",
+"R17",
+"R15",
+"R11 Plus"
+            ],
+
+            "Realme": [
+"Realme GT",
+"Realme X2 Pro",
+"Realme X2",
+"Realme X Master",
+"Realme 5",
+"Realme XT",
+"Realme Q3"
+            ],
+
+            "Samsung": [
+"Galaxy S25 Ultra",
+"Galaxy S25+",
+"Galaxy S25",
+"Galaxy S24 Ultra",
+"Galaxy S24+",
+"Galaxy S24",
+"Galaxy S23 Ultra",
+"Galaxy S23+",
+"Galaxy S22 Ultra",
+"Galaxy S22+",
+"Galaxy S22",
+"Galaxy S21 Ultra",
+"Galaxy S21",
+"Galaxy S20 Ultra",
+"Galaxy S20+",
+"Galaxy S20",
+"Galaxy S10+",
+"Galaxy S10",
+"Galaxy S9+",
+"Galaxy S9",
+"Galaxy S8+",
+"Galaxy S8",
+"Galaxy Note 20 Ultra",
+"Galaxy Note 10+",
+"Galaxy Note10 Lite",
+"Galaxy Note 10",
+"Galaxy Note 9",
+"Galaxy Note 8",
+"Galaxy Z Flip 4",
+"Galaxy Z Fold3 5G",
+"Galaxy A72",
+"Galaxy A71",
+"Galaxy A70",
+"Galaxy A53",
+"Galaxy A52s 5G",
+"Galaxy A52",
+"Galaxy A51",
+"Galaxy A50",
+"Galaxy S20 FE",
+"Galaxy S21+",
+"Galaxy S10e"
+            ],
+
+            "VIVO": [
+"X200 Pro",
+"X200 Pro mini",
+"X100 Ultra",
+"X100 Pro",
+"X90 Pro+",
+"X90 Pro",
+"X80 Pro",
+"X80",
+"X70 Pro+",
+"X70 Pro",
+"X70",
+"X60 Pro",
+"X60",
+"X50 Pro",
+"X50",
+"X30 Pro",
+"X30",
+"X27",
+"iQOO 12 Pro",
+"iQOO 10 Pro",
+"iQOO 9 Pro",
+"iQOO 9",
+"iQOO 8",
+"iQOO Neo 5",
+"S12",
+"S10 Pro",
+"S10",
+"S9",
+"S5",
+"Nex 3S",
+"Nex S",
+"Z5X"
+            ],
+
+            "Xiaomi": [
+"Mi 15 Ultra",
+"Mi 15 Pro",
+"Mi 15",
+"Mi 14 Ultra",
+"Mi 14 Pro",
+"Mi 14",
+"Mi 13 Ultra",
+"Mi 13 Pro",
+"Mi 12S Ultra",
+"Mi 12S Pro",
+"Mi 12S",
+"Mi 12 Pro",
+"Mi 12",
+"Mi 11 Pro",
+"Mi 11 Ultra",
+"Mi 11T Pro",
+"Mi 11T",
+"Mi 11",
+"Mi 10 Ultra",
+"Mi 10 Pro",
+"Mi 10S",
+"Mi 10",
+"Mi 10T Pro 5G",
+"Mi 10 Youth 5G",
+"Mi 9",
+"Mi 8",
+"MiX 4",
+"MiX 3",
+"MiX 2S",
+"MiX 2",
+"Mi CC9 Pro",
+"Mi CC9",
+"Redmi K70 Pro",
+"Redmi K70",
+"Redmi K60 Pro",
+"Redmi K50 Pro",
+"Redmi K40 Pro+",
+"Redmi K40 Pro",
+"Redmi K40 Gaming",
+"Redmi K40",
+"Redmi K30 至尊纪念版",
+"Redmi K30 Ultra",
+"Redmi K30 Pro",
+"Redmi K30",
+"Redmi K20 Pro",
+"Redmi Note 11 Pro",
+"Redmi Note 10 Pro",
+"Redmi Note 9 Pro",
+"Redmi Note 9S",
+"Redmi Note 9",
+"Redmi Note 8 Pro",
+"Redmi Note 8",
+"Redmi Note 7",
+"Poco X3 Pro",
+"Poco X3 NFC",
+"Poco F3"
+            ],
+
+            "Nothing": [
+                "Nothing Phone 1"
+            ]
+        };
+        
+
+        const droneParameters = {
+            "Osmo Mobile 3": {
+                width: "67-84mm",
+                thickness: "≤10mm",
+                weight: "≤230g",
+                clamp: "70-85mm",
+                note: "不支持折叠屏手机"
+            },
+            "DJI OM 4": {
+                width: "67-84mm",
+                thickness: "≤9.5mm",
+                weight: "≤230g",
+                clamp: "72-86mm",
+                note: "磁吸手机夹需额外购买"
+            },
+            "DJI OM 4 SE": {
+                width: "67-84mm",
+                thickness: "≤10mm",
+                weight: "≤230g",
+                clamp: "72-86mm",
+                note: "兼容磁吸手机壳设计"
+            },
+            "DJI OM 5": {
+                width: "67-84mm",
+                thickness: "≤10mm",
+                weight: "≤230g",
+                clamp: "70-85mm",
+                note: "自带可伸缩延长杆"
+            },
+            "Osmo Mobile SE": {
+                width: "67-84mm",
+                thickness: "≤10mm",
+                weight: "≤230g",
+                clamp: "72-86mm",
+                note: "经济型入门款"
+            },
+            "Osmo Mobile 6": {
+                width: "67-84mm",
+                thickness: "≤10mm",
+                weight: "≤230g",
+                clamp: "72-86mm",
+                note: "支持折叠屏手机"
+            },
+            "Osmo Mobile 7/7P": {
+                width: "67-88mm",
+                thickness: "≤12mm",
+                weight: "≤290g",
+                clamp: "70-90mm",
+                note: "支持折叠屏设备"
+            }
+        };
+        
+
+const compatibilityData = {
+"Osmo Mobile 3": {
+greenCheck: [
+"iPhone 11 Pro Max",
+"iPhone 11 Pro",
+"iPhone 11",
+"iPhone XS Max",
+"iPhone XS",
+"iPhone X",
+"iPhone XR",
+"iPhone 8 Plus",
+"iPhone 8",
+"iPhone 7 Plus",
+"iPhone 7",
+"iPhone 6S Plus",
+"iPhone 6S",
+"iPhone SE 2",
+"Mate 30 Pro",
+"Mate 30",
+"Mate 20 Pro",
+"Mate 20",
+"Mate 10",
+"Mate 9 Pro",
+"Mate 9",
+"P40 Pro",
+"P40",
+"P30 Pro",
+"P20 Pro",
+"P20",
+"Nova 12 Pro",
+"Nova 7 Pro",
+"Nova 7",
+"Nova 5",
+"30 Pro",
+"30",
+"20",
+"Honor V20",
+"Galaxy S10+",
+"Galaxy S10",
+"Galaxy S9+",
+"Galaxy S9",
+"Galaxy S8",
+"Galaxy Note 10+",
+"Galaxy Note 9",
+"Galaxy Note 8",
+"Mi 9",
+"Mi 8",
+"MiX 3",
+"MiX 2",
+"Reno 2",
+"Reno",
+"Find X",
+"R15",
+"X27",
+"Nex S",
+"OnePlus 7 Pro",
+"OnePlus 6T",
+"Pixel 3 XL",
+"Realme X2 Pro",
+"Realme X2",
+"Realme X Master",
+"Realme 5",
+"Realme XT"
+], 
+yellowCheck: [
+"iPhone 16 Pro Max",
+"iPhone 16 Pro",
+"iPhone 16 Plus",
+"iPhone 16",
+"iPhone 15 Pro Max",
+"iPhone 15 Pro",
+"iPhone 15 Plus",
+"iPhone 15",
+"iPhone 14 Pro",
+"iPhone 14 Plus",
+"iPhone 14",
+"iPhone 13 Pro",
+"iPhone 13",
+"iPhone 12 Pro Max",
+"iPhone 12 Pro",
+"Mate 70 Pro+",
+"Mate 70",
+"Mate 60 Pro+",
+"Mate 60 Pro",
+"Mate 60",
+"Mate 50 Pro",
+"Mate 50",
+"Mate 40 Pro+",
+"Mate 40 Pro",
+"Mate 40E",
+"Mate 40",
+"Mate 30E Pro",
+"Mate 20 X",
+"Mate 10 Pro",
+"P70 Ultra",
+"P70 Pro",
+"P70",
+"P60 Pro",
+"P60",
+"P50 Pro",
+"P50E",
+"P50",
+"P40 Pro+",
+"Nova 10 Pro",
+"Nova 9 Pro",
+"Nova 9",
+"Nova 8 Pro",
+"Nova 7 SE",
+"Nova 6",
+"Nova 5 Pro",
+"Nova 4",
+"畅享 20 Pro",
+"畅享 20e",
+"300 Pro",
+"200 Pro",
+"100 Pro",
+"90 Pro",
+"80 Pro",
+"70 Pro",
+"60 Pro",
+"60",
+"50 Pro",
+"50 SE",
+"50",
+"20 Pro",
+"Magic 7 Pro",
+"Magic 6 Pro",
+"Magic 5 Pro",
+"Magic 4 Pro",
+"Magic 4",
+"Magic 3 Pro",
+"Magic 3",
+"Magic 2",
+"Honor V40",
+"Honor V30 Pro",
+"Honor V30",
+"Honor X30",
+"Honor X10",
+"Honor 9X",
+"Honor 8X",
+"Galaxy S25 Ultra",
+"Galaxy S25+",
+"Galaxy S25",
+"Galaxy S24 Ultra",
+"Galaxy S24+",
+"Galaxy S24",
+"Galaxy S23 Ultra",
+"Galaxy S23+",
+"Galaxy S22 Ultra",
+"Galaxy S22+",
+"Galaxy S21 Ultra",
+"Galaxy S20 Ultra",
+"Galaxy S20+",
+"Galaxy S8+",
+"Galaxy Note 20 Ultra",
+"Galaxy Note10 Lite",
+"Galaxy Z Flip 4",
+"Galaxy A72",
+"Galaxy A71",
+"Galaxy A70",
+"Galaxy A52s 5G",
+"Galaxy A52",
+"Galaxy A51",
+"Galaxy S20 FE",
+"Galaxy S21+",
+"Mi 15 Ultra",
+"Mi 15 Pro",
+"Mi 15",
+"Mi 14 Ultra",
+"Mi 14 Pro",
+"Mi 14",
+"Mi 13 Ultra",
+"Mi 13 Pro",
+"Mi 12S Ultra",
+"Mi 12S Pro",
+"Mi 12S",
+"Mi 12 Pro",
+"Mi 12",
+"Mi 11 Pro",
+"Mi 11T Pro",
+"Mi 11T",
+"Mi 11",
+"Mi 10 Pro",
+"Mi 10S",
+"Mi 10",
+"Mi 10T Pro 5G",
+"Mi 10 Youth 5G",
+"MiX 4",
+"MiX 2S",
+"Mi CC9",
+"Redmi K70 Pro",
+"Redmi K70",
+"Redmi K60 Pro",
+"Redmi K50 Pro",
+"Redmi K40 Pro+",
+"Redmi K40 Pro",
+"Redmi K40 Gaming",
+"Redmi K40",
+"Redmi K30 至尊纪念版",
+"Redmi K30 Ultra",
+"Redmi K30 Pro",
+"Redmi K30",
+"Redmi K20 Pro",
+"Redmi Note 10 Pro",
+"Redmi Note 9 Pro",
+"Redmi Note 9S",
+"Redmi Note 9",
+"Redmi Note 8 Pro",
+"Redmi Note 8",
+"Redmi Note 7",
+"Poco X3 Pro",
+"Poco X3 NFC",
+"Poco F3",
+"Reno 12 Pro",
+"Reno 11 Pro",
+"Reno 10 Pro",
+"Reno 9",
+"Reno 8 Pro",
+"Reno 8",
+"Reno 7 Pro",
+"Reno 7",
+"Reno 6 Pro+",
+"Reno 极 6 Pro",
+"Reno 6",
+"Reno 5 Pro+",
+"Reno 5 Pro",
+"Reno 5",
+"Reno 4 SE 5G",
+"Reno 3 Pro",
+"Reno ACE",
+"Find X8 Ultra",
+"Find X8 S+",
+"Find X8 S",
+"Find X8 Pro",
+"Find X8",
+"Find X7 Ultra",
+"Find X7",
+"Find X6 Pro",
+"Find X6",
+"Find X5 Pro",
+"Find X3 Pro",
+"Find X3",
+"Find X2 Pro",
+"R17 Pro",
+"R17",
+"R11 Plus",
+"X200 Pro",
+"X200 Pro mini",
+"X100 Pro",
+"X90 Pro+",
+"X90 Pro",
+"X80 Pro",
+"X80",
+"X70 Pro+",
+"X50",
+"X30 Pro",
+"X30",
+"iQOO 12 Pro",
+"iQOO 10 Pro",
+"iQOO 9 Pro",
+"iQOO 9",
+"iQOO 8",
+"iQOO Neo 5",
+"S12",
+"S10 Pro",
+"S10",
+"S9",
+"S5",
+"Nex 3S",
+"Z5X",
+"OnePlus 13",
+"OnePlus 12",
+"OnePlus 11",
+"OnePlus 10 Pro",
+"OnePlus 9 Pro",
+"OnePlus 9 RT",
+"OnePlus 8 Pro",
+"OnePlus 8T",
+"OnePlus 8",
+"OnePlus 7T",
+"Pixel 9 Pro XL",
+"Pixel 9",
+"Pixel 8 Pro",
+"Pixel 8",
+"Pixel 7 Pro",
+"Pixel 7",
+"Pixel 6 Pro",
+"Pixel 6",
+"Pixel 4XL",
+"Realme GT",
+"Realme Q3",
+"G8X ThinQ",
+"V60 ThinQ",
+"Nothing Phone 1"
+], 
+yellowCross: [
+"iPhone 14 Pro Max",
+"iPhone 13 Pro Max",
+"P30 lite",
+"P9",
+"Nova 8",
+"10",
+"Galaxy A50",
+"Galaxy S10e",
+"X100 Ultra",
+"meizu 18"
+], 
+redCross: [
+"iPhone 13 Mini",
+"iPhone 12",
+"iPhone 12 Mini",
+"iPhone 6",
+"iPhone SE",
+"Mate 70 RS 非凡大师",
+"Mate 40 RS（porsche-design）",
+"Mate X2",
+"P30",
+"Galaxy S22",
+"Galaxy S21",
+"Galaxy S20",
+"Galaxy Note 10",
+"Galaxy Z Fold3 5G",
+"Galaxy A53",
+"Mi 11 Ultra",
+"Mi 10 Ultra",
+"Mi CC9 Pro",
+"Redmi Note 11 Pro",
+"Reno 4 Pro",
+"X70 Pro",
+"X70",
+"X60 Pro",
+"X60",
+"X50 Pro",
+"Pixel 5",
+"Pixel 4A",
+"Pixel 4"
+]
+    },
+
+"DJI OM 4": {
+  greenCheck: [
+    "iPhone 13 Pro Max",
+    "iPhone 13 Pro",
+    "iPhone 13",
+    "iPhone 12 Pro Max",
+    "iPhone 12 Pro",
+    "iPhone 12",
+    "iPhone 11 Pro Max",
+    "iPhone 11 Pro",
+    "iPhone 11",
+    "iPhone XS Max",
+    "iPhone XS",
+    "iPhone X",
+    "iPhone XR",
+    "iPhone 8 Plus",
+    "iPhone 8",
+    "Mate 40 Pro+",
+    "Mate 40 Pro",
+    "Mate 40",
+    "Mate 30 Pro",
+    "Mate 30",
+    "Mate 20",
+    "Mate 10",
+    "Mate 9",
+    "P50 Pro",
+    "P40 Pro+",
+    "P40 Pro",
+    "P40",
+    "P30 Pro",
+    "P30",
+    "P20 Pro",
+    "Nova 12 Pro",
+    "Nova 7",
+    "30 Pro",
+    "30",
+    "20 Pro",
+    "Honor V40",
+    "Galaxy S21 Ultra",
+    "Galaxy S20 Ultra",
+    "Galaxy S20+",
+    "Galaxy S20",
+    "Galaxy S10+",
+    "Galaxy S10",
+    "Galaxy S9+",
+    "Galaxy Note 20 Ultra",
+    "Galaxy Note 10+",
+    "Galaxy Note 9",
+    "Mi 12 Pro",
+    "Mi 12",
+    "Mi 11 Pro",
+    "Mi 11 Ultra",
+    "Mi 11",
+    "Mi 10 Pro",
+    "Mi 10",
+    "Mi 9",
+    "MiX 4",
+    "Redmi K40 Pro+",
+    "Redmi K30 Pro",
+    "Redmi K30",
+    "Reno 6 Pro+",
+    "Reno 5 Pro+",
+    "Reno 5 Pro",
+    "Reno 5",
+    "Reno 3 Pro",
+    "Find X2 Pro",
+    "Find X",
+    "X70 Pro+",
+    "X50",
+    "X30 Pro",
+    "X30",
+    "X27",
+    "Nex 3S",
+    "OnePlus 9 Pro",
+    "OnePlus 8",
+    "OnePlus 7 Pro",
+    "Pixel 6 Pro",
+    "Pixel 6",
+    "Pixel 5",
+    "Pixel 4XL",
+    "Pixel 4",
+    "Realme GT",
+    "G8X ThinQ",
+    "V60 ThinQ"
+  ],
+  yellowCheck: [
+    "iPhone 16 Pro Max",
+    "iPhone 16 Pro",
+    "iPhone 16 Plus",
+    "iPhone 16",
+    "iPhone 15 Pro Max",
+    "iPhone 15 Pro",
+    "iPhone 15 Plus",
+    "iPhone 15",
+    "iPhone 14 Pro Max",
+    "iPhone 14 Pro",
+    "iPhone 14 Plus",
+    "iPhone 14",
+    "iPhone 7 Plus",
+    "iPhone 7",
+    "iPhone 6S Plus",
+    "iPhone SE 2",
+    "Mate 70 Pro+",
+    "Mate 70 RS 非凡大师",
+    "Mate 70",
+    "Mate 60 Pro+",
+    "Mate 60 Pro",
+    "Mate 60",
+    "Mate 50 Pro",
+    "Mate 50",
+    "Mate 40E",
+    "Mate 30E Pro",
+    "Mate 20 Pro",
+    "Mate 10 Pro",
+    "P70 Ultra",
+    "P70 Pro",
+    "P70",
+    "P60 Pro",
+    "P60",
+    "P50E",
+    "P50",
+    "Nova 10 Pro",
+    "Nova 9 Pro",
+    "Nova 9",
+    "Nova 8 Pro",
+    "Nova 7 Pro",
+    "Nova 7 SE",
+    "Nova 6",
+    "Nova 5 Pro",
+    "Nova 5",
+    "Nova 4",
+    "畅享 20 Pro",
+    "畅享 20e",
+    "300 Pro",
+    "200 Pro",
+    "100 Pro",
+    "90 Pro",
+    "80 Pro",
+    "70 Pro",
+    "60 Pro",
+    "60",
+    "50 Pro",
+    "50 SE",
+    "50",
+    "20",
+    "Magic 7 Pro",
+    "Magic 6 Pro",
+    "Magic 5 Pro",
+    "Magic 4 Pro",
+    "Magic 4",
+    "Magic 3 Pro",
+    "Magic 3",
+    "Magic 2",
+    "Honor V30 Pro",
+    "Honor V30",
+    "Honor V20",
+    "Honor X30",
+    "Honor X10",
+    "Honor 9X",
+    "Honor 8X",
+    "Galaxy S25 Ultra",
+    "Galaxy S25+",
+    "Galaxy S25",
+    "Galaxy S24 Ultra",
+    "Galaxy S24+",
+    "Galaxy S24",
+    "Galaxy S23 Ultra",
+    "Galaxy S23+",
+    "Galaxy S22 Ultra",
+    "Galaxy S22+",
+    "Galaxy S8+",
+    "Galaxy Note10 Lite",
+    "Galaxy Note 8",
+    "Galaxy Z Flip 4",
+    "Galaxy A72",
+    "Galaxy A71",
+    "Galaxy A70",
+    "Galaxy A52s 5G",
+    "Galaxy A52",
+    "Galaxy A51",
+    "Galaxy S20 FE",
+    "Galaxy S21+",
+    "Mi 15 Ultra",
+    "Mi 15 Pro",
+    "Mi 15",
+    "Mi 14 Ultra",
+    "Mi 14 Pro",
+    "Mi 14",
+    "Mi 13 Ultra",
+    "Mi 13 Pro",
+    "Mi 12S Ultra",
+    "Mi 12S Pro",
+    "Mi 12S",
+    "Mi 11T Pro",
+    "Mi 11T",
+    "Mi 10S",
+    "Mi 10T Pro 5G",
+    "Mi 10 Youth 5G",
+    "Mi 8",
+    "MiX 3",
+    "MiX 2S",
+    "MiX 2",
+    "Mi CC9 Pro",
+    "Mi CC9",
+    "Redmi K70 Pro",
+    "Redmi K70",
+    "Redmi K60 Pro",
+    "Redmi K50 Pro",
+    "Redmi K40 Pro",
+    "Redmi K40 Gaming",
+    "Redmi K40",
+    "Redmi K30 至尊纪念版",
+    "Redmi K30 Ultra",
+    "Redmi K20 Pro",
+    "Redmi Note 10 Pro",
+    "Redmi Note 9 Pro",
+    "Redmi Note 9S",
+    "Redmi Note 9",
+    "Redmi Note 8 Pro",
+    "Redmi Note 8",
+    "Redmi Note 7",
+    "Poco X3 Pro",
+    "Poco X3 NFC",
+    "Poco F3",
+    "Reno 12 Pro",
+    "Reno 11 Pro",
+    "Reno 10 Pro",
+    "Reno 9",
+    "Reno 8 Pro",
+    "Reno 8",
+    "Reno 7 Pro",
+    "Reno 7",
+    "Reno 6 Pro",
+    "Reno 6",
+    "Reno 4 SE 5G",
+    "Reno 2",
+    "Reno",
+    "Reno ACE",
+    "Find X8 Ultra",
+    "Find X8 S+",
+    "Find X8 S",
+    "Find X8 Pro",
+    "Find X8",
+    "Find X7 Ultra",
+    "Find X7",
+    "Find X6 Pro",
+    "Find X6",
+    "Find X5 Pro",
+    "Find X3",
+    "R17 Pro",
+    "R17",
+    "R15",
+    "R11 Plus",
+    "X200 Pro",
+    "X200 Pro mini",
+    "X100 Pro",
+    "X90 Pro+",
+    "X90 Pro",
+    "X80 Pro",
+    "X80",
+    "iQOO 12 Pro",
+    "iQOO 10 Pro",
+    "iQOO 9 Pro",
+    "iQOO 9",
+    "iQOO 8",
+    "iQOO Neo 5",
+    "S12",
+    "S10 Pro",
+    "S10",
+    "S9",
+    "S5",
+    "Nex S",
+    "Z5X",
+    "OnePlus 13",
+    "OnePlus 12",
+    "OnePlus 11",
+    "OnePlus 10 Pro",
+    "OnePlus 9 RT",
+    "OnePlus 8 Pro",
+    "OnePlus 8T",
+    "OnePlus 7T",
+    "OnePlus 6T",
+    "Pixel 9 Pro XL",
+    "Pixel 9",
+    "Pixel 8 Pro",
+    "Pixel 8",
+    "Pixel 7 Pro",
+    "Pixel 7",
+    "Pixel 3 XL",
+    "Realme X2 Pro",
+    "Realme X2",
+    "Realme X Master",
+    "Realme 5",
+    "Realme XT",
+    "Realme Q3",
+    "Nothing Phone 1"
+  ],
+  yellowCross: [
+    "Mate 9 Pro",
+    "P30 lite",
+    "P20",
+    "P9",
+    "Nova 8",
+    "10",
+    "Galaxy S22",
+    "Galaxy S21",
+    "Galaxy S9",
+    "Galaxy S8",
+    "Galaxy Note 10",
+    "Galaxy A50",
+    "Galaxy S10e",
+    "Find X3 Pro",
+    "X100 Ultra",
+    "meizu 18"
+  ],
+  redCross: [
+    "iPhone 13 Mini",
+    "iPhone 12 Mini",
+    "iPhone 6S",
+    "iPhone 6",
+    "iPhone SE",
+    "Mate 40 RS（porsche-design）",
+    "Mate 20 X",
+    "Mate X2",
+    "Galaxy Z Fold3 5G",
+    "Galaxy A53",
+    "Mi 10 Ultra",
+    "Redmi Note 11 Pro",
+    "Reno 4 Pro",
+    "X70 Pro",
+    "X70",
+    "X60 Pro",
+    "X60",
+    "X50 Pro",
+    "Pixel 4A"
+  ]
+    },
+
+"DJI OM 4 SE": {
+  greenCheck: [
+    "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13", "iPhone 12 Pro Max", "iPhone 12 Pro", "iPhone 12", "iPhone 11 Pro Max", "iPhone 11 Pro", "iPhone 11", "iPhone XS Max", "iPhone XS", "iPhone X", "iPhone XR", "iPhone 8 Plus", "iPhone 8", 
+    "Mate 40 Pro+", "Mate 40 Pro", "Mate 40", "Mate 30 Pro", "Mate 30", "P50 Pro", "P40 Pro+", "P40 Pro", "P40", "P30 Pro", "P30", "P20 Pro", 
+    "Nova 12 Pro", "Nova 7", "30 Pro", "30", "20 Pro", "Honor V40", 
+    "Galaxy S21 Ultra", "Galaxy S20 Ultra", "Galaxy S20+", "Galaxy S20", "Galaxy S10+", "Galaxy S10", "Galaxy S9+", "Galaxy Note 20 Ultra", "Galaxy Note 10+", "Galaxy Note 9", 
+    "Mi 12 Pro", "Mi 12", "Mi 11 Pro", "Mi 11 Ultra", "Mi 11", "Mi 10 Pro", "Mi 10", "Mi 9", "MiX 4", 
+    "Redmi K40 Pro+", "Redmi K30 Pro", "Redmi K30", 
+    "Reno 6 Pro+", "Reno 5 Pro+", "Reno 5 Pro", "Reno 5", "Reno 3 Pro", 
+    "Find X2 Pro", "Find X", 
+    "X70 Pro+", "X50", "X30 Pro", "X30", "X27", "Nex 3S", 
+    "OnePlus 9 Pro", "OnePlus 8", "OnePlus 7 Pro", 
+    "Pixel 6 Pro", "Pixel 6", "Pixel 5", "Pixel 4XL", "Pixel 4", 
+    "Realme GT", "G8X ThinQ", "V60 ThinQ"
+  ],
+  yellowCheck: [
+    "iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16 Plus", "iPhone 16", "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15", "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14 Plus", "iPhone 14", "iPhone 7 Plus", "iPhone 7", "iPhone 6S Plus", 
+    "Mate 70 Pro+", "Mate 70 RS 非凡大师", "Mate 70", "Mate 60 Pro+", "Mate 60 Pro", "Mate 60", "Mate 50 Pro", "Mate 50", "Mate 40E", "Mate 30E Pro", "Mate 20 Pro", "Mate 20", "Mate 10 Pro", "Mate 10", "Mate 9", 
+    "P70 Ultra", "P70 Pro", "P70", "P60 Pro", "P60", "P50E", "P50", 
+    "Nova 10 Pro", "Nova 9 Pro", "Nova 9", "Nova 8 Pro", "Nova 7 Pro", "Nova 7 SE", "Nova 6", "Nova 5 Pro", "Nova 5", "Nova 4", 
+    "畅享 20 Pro", "畅享 20e", "300 Pro", "200 Pro", "100 Pro", "90 Pro", "80 Pro", "70 Pro", "60 Pro", "60", "50 Pro", "50 SE", "50", "20", 
+    "Magic 7 Pro", "Magic 6 Pro", "Magic 5 Pro", "Magic 4 Pro", "Magic 4", "Magic 3 Pro", "Magic 3", "Magic 2", 
+    "Honor V30 Pro", "Honor V30", "Honor V20", "Honor X30", "Honor X10", "Honor 9X", "Honor 8X", 
+    "Galaxy S25 Ultra", "Galaxy S25+", "Galaxy S25", "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24", "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S22 Ultra", "Galaxy S22+", "Galaxy S8+", "Galaxy Note10 Lite", "Galaxy Note 8", "Galaxy Z Flip 4", 
+    "Galaxy A72", "Galaxy A71", "Galaxy A70", "Galaxy A52s 5G", "Galaxy A52", "Galaxy A51", "Galaxy S20 FE", "Galaxy S21+", 
+    "Mi 15 Ultra", "Mi 15 Pro", "Mi 15", "Mi 14 Ultra", "Mi 14 Pro", "Mi 14", "Mi 13 Ultra", "Mi 13 Pro", "Mi 12S Ultra", "Mi 12S Pro", "Mi 12S", "Mi 11T Pro", "Mi 11T", "Mi 10S", "Mi 10T Pro 5G", "Mi 10 Youth 5G", "Mi 8", 
+    "MiX 3", "MiX 2S", "MiX 2", "Mi CC9 Pro", "Mi CC9", 
+    "Redmi K70 Pro", "Redmi K70", "Redmi K60 Pro", "Redmi K50 Pro", "Redmi K40 Pro", "Redmi K40 Gaming", "Redmi K40", "Redmi K30 至尊纪念版", "Redmi K30 Ultra", "Redmi K20 Pro", 
+    "Redmi Note 10 Pro", "Redmi Note 9 Pro", "Redmi Note 9S", "Redmi Note 9", "Redmi Note 8 Pro", "Redmi Note 8", "Redmi Note 7", 
+    "Poco X3 Pro", "Poco X3 NFC", "Poco F3", 
+    "Reno 12 Pro", "Reno 11 Pro", "Reno 10 Pro", "Reno 9", "Reno 8 Pro", "Reno 8", "Reno 7 Pro", "Reno 7", "Reno 6 Pro", "Reno 6", "Reno 4 SE 5G", "Reno 2", "Reno", "Reno ACE", 
+    "Find X8 Ultra", "Find X8 S+", "Find X8 S", "Find X8 Pro", "Find X8", "Find X7 Ultra", "Find X7", "Find X6 Pro", "Find X6", "Find X5 Pro", "Find X3 Pro", "Find X3", 
+    "R17 Pro", "R17", "R15", "R11 Plus", 
+    "X200 Pro", "X200 Pro mini", "X100 Pro", "X90 Pro+", "X90 Pro", "X80 Pro", "X80", 
+    "iQOO 12 Pro", "iQOO 10 Pro", "iQOO 9 Pro", "iQOO 9", "iQOO 8", "iQOO Neo 5", 
+    "S12", "S10 Pro", "S10", "S9", "S5", "Nex S", 
+    "OnePlus 13", "OnePlus 12", "OnePlus 11", "OnePlus 10 Pro", "OnePlus 9 RT", "OnePlus 8 Pro", "OnePlus 8T", "OnePlus 7T", "OnePlus 6T", 
+    "Pixel 9 Pro XL", "Pixel 9", "Pixel 8 Pro", "Pixel 8", "Pixel 7 Pro", "Pixel 7", "Pixel 3 XL", 
+    "Realme X2 Pro", "Realme X2", "Realme X Master", "Realme 5", "Realme XT", "Realme Q3", 
+    "Nothing Phone 1"
+  ],
+  yellowCross: [
+    "Mate 9 Pro", "P30 lite", "P20", "P9", "Nova 8", "10", 
+    "Galaxy S22", "Galaxy S21", "Galaxy S9", "Galaxy S8", "Galaxy Note 10", "Galaxy A50", "Galaxy S10e", 
+    "X100 Ultra", "meizu 18"
+  ],
+  redCross: [
+    "iPhone 13 Mini", "iPhone 12 Mini", "iPhone 6S", "iPhone 6", "iPhone SE 2", "iPhone SE", 
+    "Mate 40 RS（porsche-design）", "Mate 20 X", "Mate X2", 
+    "Galaxy Z Fold3 5G", "Galaxy A53", 
+    "Mi 10 Ultra", 
+    "Redmi Note 11 Pro", 
+    "Reno 4 Pro", 
+    "X70 Pro", "X70", "X60 Pro", "X60", "X50 Pro", 
+    "Pixel 4A"
+  ]
+    },
+
+"DJI OM 5": {
+greenCheck: [
+"iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14 Plus", "iPhone 14", "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13", "iPhone 12 Pro Max", "iPhone 12 Pro", "iPhone 12", "iPhone 11 Pro Max", "iPhone 11 Pro", "iPhone 11", "iPhone XS Max", "iPhone XS", "iPhone XR", "Mate 50 Pro", "Mate 50", "Mate 40 Pro+", "Mate 40 Pro", "Mate 40", "Mate 30 Pro", "Mate 30", "P50 Pro", "P50", "P40 Pro+", "P40 Pro", "P40", "P30 Pro", "P30", "Nova 12 Pro", "Nova 10 Pro", "Nova 9", "Nova 8", "80 Pro", "70 Pro", "60 Pro", "30 Pro", "Magic 4", "Magic 3", "Galaxy S23 Ultra", "Galaxy S22 Ultra", "Galaxy S22", "Galaxy S21 Ultra", "G alaxy S21", "Galaxy S20 Ultra", "Galaxy S20+", "Galaxy S20", "Galaxy S10", "Galaxy Note 20 Ultra", "Galaxy Z Flip 4", "Mi 13 Pro", "Mi 12S Ultra", "Mi 12S Pro", "Mi 12S", "Mi 12 Pro", "Mi 12", "Mi 11 Pro", "Mi 11 Ultra", "Mi 11", "Mi 10 Pro", "Mi 10", "Mi 9", "Redmi K60 Pro", "Redmi K40 Pro", "Redmi K30 Pro", "Reno 6 Pro+", "Reno 6 Pro", "Reno 5 Pro+", "Reno 5 Pro", "Find X3 Pro", "X90 Pro+", "X90 Pro", "X70 Pro+", "X60 Pro", "X60", "X50", "iQOO 9 Pro", "OnePlus 11", "OnePlus 10 Pro", "OnePlus 9 Pro", "OnePlus 8 Pro", "OnePlus 8", "Pixel 9 Pro XL", "Pixel 9", "Pixel 8 Pro", "Pixel 8", "Pixel 7 Pro", "Pixel 7", "Pixel 6 Pro", "Pixel 6", "Pixel 5", "Pixel 4", "Nothing Phone 1"
+],
+yellowCheck: [
+"iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16 Plus", "iPhone 16", "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15", "iPhone X", "iPhone 8 Plus", "iPhone 8", "iPhone 7 Plus", "iPhone 7", "iPhone 6S Plus", "Mate 70 Pro+", "Mate 70 RS 非凡大师", "Mate 70", "Mate 60 Pro+", "Mate 60 Pro", "Mate 60", "Mate 40E", "Mate 30E Pro", "Mate 20 Pro", "Mate 20", "Mate 10 Pro", "Mate 10", "Mate 9", "P70 Ultra", "P70 Pro", "P70", "P60 Pro", "P60", "P50E", "P20 Pro", "Nova 9 Pro", "Nova 8 Pro", "Nova 7 Pro", "Nova 7", "Nova 7 SE", "Nova 6", "Nova 5 Pro", "Nova 5", "Nova 4", "畅享 20 Pro", "畅享 20e", "300 Pro", "200 Pro", "100 Pro", "90 Pro", "60", "50 Pro", "50 SE", "50", "30", "20 Pro", "20", "Magic 7 Pro", "Magic 6 Pro", "Magic 5 Pro", "Magic 4 Pro", "Magic 3 Pro", "Magic 2", "Honor V40", "Honor V30 Pro", "Honor V30", "Honor V20", "Honor X30", "Honor X10", "Honor 9X", "Honor 8X", "Galaxy S25 Ultra", "Galaxy S25+", "Galaxy S25", "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24", "Galaxy S23+", "Galaxy S22+", "Galaxy S10+", "Galaxy S9+", "Galaxy S8+", "Galaxy Note 10+", "Galaxy Note10 Lite", "Galaxy Note 9", "Galaxy Note 8", "Galaxy A72", "Galaxy A71", "Galaxy A70", "Galaxy A52s 5G", "Galaxy A52", "Galaxy A51", "Galaxy S20 FE", "Galaxy S21+", "Mi 15 Ultra", "Mi 15 Pro", "Mi 15", "Mi 14 Ultra", "Mi 14 Pro", "Mi 14", "Mi 13 Ultra", "Mi 11T Pro", "Mi 11T", "Mi 10S", "Mi 10T Pro 5G", "Mi 10 Youth 5G", "Mi 8", "MiX 4", "MiX 3", "MiX 2S", "MiX 2", "Mi CC9 Pro", "Mi CC9", "Redmi K70 Pro", "Redmi K70", "Redmi K50 Pro", "Redmi K40 Pro+", "Redmi K40 Gaming", "Redmi K40", "Redmi K30 至尊纪念版", "Redmi K30 Ultra", "Redmi K30", "Redmi K20 Pro", "Redmi Note 10 Pro", "Redmi Note 9 Pro", "Redmi Note 9S", "Redmi Note 9", "Redmi Note 8 Pro", "Redmi Note 8", "Redmi Note 7", "Poco X3 Pro", "Poco X3 NFC", "Poco F3", "Reno 12 Pro", "Reno 11 Pro", "Reno 10 Pro", "Reno 9", "Reno 8 Pro", "Reno 8", "Reno 7 Pro", "Reno 7", "Reno 6", "Reno 5", "Reno 4 SE 5G", "Reno 3 Pro", "Reno 2", "Reno", "Reno ACE", "Find X8 Ultra", "Find X8 S+", "Find X8 S", "Find X8 Pro", "Find X8", "Find X7 Ultra", "Find X7", "Find X6 Pro", "Find X6", "Find X5 Pro", "Find X3", "Find X2 Pro", "Find X", "R17 Pro", "R17", "R15", "R11 Plus", "X200 Pro", "X200 Pro mini", "X100 Pro", "X80 Pro", "X80", "X70 Pro", "X50 Pro", "X30 Pro", "X30", "iQOO 12 Pro", "iQOO 10 Pro", "iQOO 9", "iQOO 8", "iQOO Neo 5", "S12", "S10 Pro", "S10", "S9", "S5", "Nex 3S", "Nex S", "Z5X", "OnePlus 13", "OnePlus 12", "OnePlus 9 RT", "OnePlus 8T", "OnePlus 7 Pro", "OnePlus 7T", "OnePlus 6T", "Pixel 4XL", "Pixel 3 XL", "Realme GT", "Realme X2 Pro", "Realme X2", "Realme X Master", "Realme 5", "Realme XT", "Realme Q3", "G8X ThinQ", "V60 ThinQ"
+],
+yellowCross: [
+"Mate 9 Pro", "P30 lite", "P20", "P9", "10", "Galaxy S9", "Galaxy S8", "Galaxy Note 10", "Galaxy A50", "Galaxy S10e", "X100 Ultra", "meizu 18"
+],
+redCross: [
+"iPhone 13 Mini", "iPhone 12 Mini", "iPhone 6S", "iPhone 6", "iPhone SE 2", "iPhone SE", "Mate 40 RS（porsche-design）", "Mate 20 X", "Mate X2", "Galaxy Z Fold3 5G", "Galaxy A53", "Mi 10 Ultra", "Redmi Note 11 Pro", "Reno 4 Pro", "X70", "X27", "Pixel 4A"
+]
+    },
+
+"Osmo Mobile SE": {
+  greenCheck: [
+    "iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16 Plus", "iPhone 16", 
+    "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15", 
+    "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14 Plus", "iPhone 14", 
+    "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13 Mini", "iPhone 13", 
+    "iPhone 12 Pro Max", "iPhone 12 Pro", "iPhone 12", "iPhone 12 Mini", 
+    "iPhone 11 Pro Max", "iPhone 11 Pro", "iPhone 11", "iPhone XS Max", 
+    "iPhone XS", "iPhone XR", "Mate 70 Pro+", "Mate 70 RS 非凡大师", "Mate 70", 
+    "Mate 60 Pro+", "Mate 60 Pro", "Mate 60", "Mate 50 Pro", "Mate 50", 
+    "Mate 40 Pro+", "Mate 40 Pro", "Mate 40", "Mate 30 Pro", "Mate 30", 
+    "P70 Ultra", "P70 Pro", "P70", "P60 Pro", "P60", "P50 Pro", "P50", 
+    "P40 Pro+", "P40 Pro", "P40", "P30 Pro", "P30", "Nova 12 Pro", "Nova 10 Pro", 
+    "Nova 9", "300 Pro", "200 Pro", "100 Pro", "90 Pro", "80 Pro", "70 Pro", 
+    "60 Pro", "50 Pro", "Magic 7 Pro", "Magic 6 Pro", "Magic 5 Pro", "Magic 4", 
+    "Magic 3", "Galaxy S25 Ultra", "Galaxy S25+", "Galaxy S25", "Galaxy S24 Ultra", 
+    "Galaxy S24+", "Galaxy S24", "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S22 Ultra", 
+    "Galaxy S22+", "Galaxy S22", "Galaxy S21 Ultra", "Galaxy S21", "Galaxy S20 Ultra", 
+    "Galaxy S20+", "Galaxy S20", "Galaxy Note 20 Ultra", "Galaxy Z Flip 4", 
+    "Mi 15 Ultra", "Mi 15 Pro", "Mi 15", "Mi 14 Pro", "Mi 14", "Mi 13 Ultra", 
+    "Mi 13 Pro", "Mi 12S Ultra", "Mi 12S Pro", "Mi 12S", "Mi 12 Pro", "Mi 12", 
+    "Mi 11 Pro", "Mi 11 Ultra", "Mi 11", "Mi 10 Pro", "Mi 10", "Redmi K70 Pro", 
+    "Redmi K70", "Redmi K60 Pro", "Redmi K40 Pro", "Reno 11 Pro", "Reno 10 Pro", 
+    "Reno 9", "Reno 8 Pro", "Reno 7 Pro", "Reno 6 Pro+", "Reno 5 Pro+", 
+    "Find X8 Ultra", "Find X8 S+", "Find X8 Pro", "Find X8", "Find X7 Ultra", 
+    "Find X7", "Find X6 Pro", "Find X6", "Find X5 Pro", "Find X3 Pro", "X100 Pro", 
+    "X90 Pro+", "X90 Pro", "X80 Pro", "X80", "X70", "iQOO 12 Pro", "iQOO 9 Pro", 
+    "OnePlus 13", "OnePlus 12", "OnePlus 11", "OnePlus 10 Pro", "OnePlus 9 Pro", 
+    "OnePlus 8 Pro", "OnePlus 8", "Pixel 9 Pro XL", "Pixel 9", "Pixel 8 Pro", 
+    "Pixel 8", "Pixel 7 Pro", "Pixel 7", "Pixel 6 Pro", "Pixel 6", "Pixel 5", 
+    "Nothing Phone 1"
+  ],
+  yellowCheck: [
+    "iPhone X", "iPhone 8 Plus", "iPhone 7 Plus", "iPhone 6S Plus", 
+    "Mate 40E", "Mate 30E Pro", "Mate 20 Pro", "Mate 20", "Mate 10 Pro", 
+    "Mate 10", "Mate 9", "P50E", "P20 Pro", "P20", "Nova 9 Pro", "Nova 8 Pro", 
+    "Nova 8", "Nova 7 Pro", "Nova 7", "Nova 7 SE", "Nova 6", "Nova 5 Pro", 
+    "Nova 5", "Nova 4", "畅享 20 Pro", "畅享 20e", "60", "50 SE", "50", 
+    "30 Pro", "30", "20 Pro", "20", "Magic 4 Pro", "Magic 3 Pro", "Magic 2", 
+    "Honor V40", "Honor V30 Pro", "Honor V30", "Honor V20", "Honor X30", 
+    "Honor X10", "Honor 9X", "Honor 8X", "Galaxy S10+", "Galaxy S9+", 
+    "Galaxy S8+", "Galaxy Note 10+", "Galaxy Note10 Lite", "Galaxy Note 10", 
+    "Galaxy Note 9", "Galaxy Note 8", "Galaxy A72", "Galaxy A71", "Galaxy A70", 
+    "Galaxy A52s 5G", "Galaxy A52", "Galaxy A51", "Galaxy A50", "Galaxy S20 FE", 
+    "Galaxy S21+", "Mi 14 Ultra", "Mi 11T Pro", "Mi 11T", "Mi 10S", 
+    "Mi 10T Pro 5G", "Mi 10 Youth 5G", "Mi 9", "Mi 8", "MiX 4", "MiX 3", 
+    "MiX 2S", "MiX 2", "Mi CC9 Pro", "Mi CC9", "Redmi K50 Pro", "Redmi K40 Pro+", 
+    "Redmi K40 Gaming", "Redmi K40", "Redmi K30 至尊纪念版", "Redmi K30 Ultra", 
+    "Redmi K30 Pro", "Redmi K30", "Redmi K20 Pro", "Redmi Note 10 Pro", 
+    "Redmi Note 9 Pro", "Redmi Note 9S", "Redmi Note 9", "Redmi Note 8 Pro", 
+    "Redmi Note 8", "Redmi Note 7", "Poco X3 Pro", "Poco X3 NFC", "Poco F3", 
+    "Reno 12 Pro", "Reno 8", "Reno 7", "Reno 6 Pro", "Reno 6", "Reno 5 Pro", 
+    "Reno 5", "Reno 4 SE 5G", "Reno 3 Pro", "Reno 2", "Reno", "Reno ACE", 
+    "Find X8 S", "Find X3", "Find X2 Pro", "Find X", "R17 Pro", "R17", "R15", 
+    "R11 Plus", "X200 Pro", "X200 Pro mini", "X70 Pro+", "X70 Pro", "X60 Pro", 
+    "X60", "X50 Pro", "X50", "X30 Pro", "X30", "iQOO 10 Pro", "iQOO 9", "iQOO 8", 
+    "iQOO Neo 5", "S12", "S10 Pro", "S10", "S9", "S5", "Nex 3S", "Nex S", "Z5X", 
+    "OnePlus 9 RT", "OnePlus 8T", "OnePlus 7 Pro", "OnePlus 7T", "OnePlus 6T", 
+    "Pixel 4XL", "Pixel 4", "Pixel 3 XL", "Realme GT", "Realme X2 Pro", 
+    "Realme X2", "Realme X Master", "Realme 5", "Realme XT", "Realme Q3", 
+    "G8X ThinQ", "V60 ThinQ"
+  ],
+  yellowCross: [
+    "iPhone 8", "iPhone 7", "Mate 9 Pro", "P30 lite", "P9", "10", 
+    "Galaxy S10", "Galaxy S9", "Galaxy S8", "Galaxy S10e", "X100 Ultra", 
+    "meizu 18"
+  ],
+  redCross: [
+    "iPhone 6S", "iPhone 6", "iPhone SE 2", "iPhone SE", 
+    "Mate 40 RS（porsche-design）", "Mate 20 X", "Mate X2", 
+    "Galaxy Z Fold3 5G", "Galaxy A53", "Mi 10 Ultra", "Redmi Note 11 Pro", 
+    "Reno 4 Pro", "X27", "Pixel 4A"
+  ]
+    },
+
+"Osmo Mobile 6": {
+  "greenCheck": [
+    "iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16 Plus", "iPhone 16",
+    "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15",
+    "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14 Plus", "iPhone 14",
+    "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13 Mini", "iPhone 13",
+    "iPhone 12 Pro Max", "iPhone 12 Pro", "iPhone 12", "iPhone 12 Mini",
+    "iPhone 11 Pro Max", "iPhone 11 Pro", "iPhone 11",
+    "iPhone XS Max", "iPhone XS", "iPhone XR",
+    "Mate 70 Pro+", "Mate 70 RS 非凡大师", "Mate 70",
+    "Mate 60 Pro+", "Mate 60 Pro", "Mate 60",
+    "Mate 50 Pro", "Mate 50",
+    "Mate 40 Pro+", "Mate 40 Pro", "Mate 40",
+    "Mate 30 Pro", "Mate 30",
+    "P70 Ultra", "P70 Pro", "P70",
+    "P60 Pro", "P60",
+    "P50 Pro", "P50",
+    "P40 Pro+", "P40 Pro", "P40",
+    "P30 Pro", "P30",
+    "Nova 12 Pro", "Nova 10 Pro", "Nova 9",
+    "300 Pro", "200 Pro", "100 Pro", "90 Pro", "80 Pro", "70 Pro", "60 Pro", "50 Pro",
+    "Magic 7 Pro", "Magic 6 Pro", "Magic 5 Pro", "Magic 4", "Magic 3",
+    "Galaxy S25 Ultra", "Galaxy S25+", "Galaxy S25",
+    "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24",
+    "Galaxy S23 Ultra", "Galaxy S23+",
+    "Galaxy S22 Ultra", "Galaxy S22+", "Galaxy S22",
+    "Galaxy S21 Ultra", "Galaxy S21",
+    "Galaxy S20 Ultra", "Galaxy S20+", "Galaxy S20",
+    "Galaxy Note 20 Ultra",
+    "Galaxy Z Flip 4",
+    "Mi 15 Pro", "Mi 15", "Mi 14 Pro", "Mi 14",
+    "Mi 13 Ultra", "Mi 13 Pro",
+    "Mi 12S Ultra", "Mi 12S Pro", "Mi 12S",
+    "Mi 12 Pro", "Mi 12",
+    "Mi 11 Pro", "Mi 11 Ultra", "Mi 11",
+    "Mi 10 Pro", "Mi 10",
+    "Redmi K70 Pro", "Redmi K70", "Redmi K60 Pro", "Redmi K40 Pro",
+    "Reno 11 Pro", "Reno 10 Pro", "Reno 9", "Reno 8 Pro", "Reno 7 Pro", "Reno 6 Pro+", "Reno 5 Pro+",
+    "Find X8 Ultra", "Find X8 S+", "Find X8 Pro", "Find X8", "Find X7 Ultra", "Find X7", "Find X6 Pro", "Find X6", "Find X5 Pro", "Find X3 Pro",
+    "X100 Pro", "X90 Pro+", "X90 Pro", "X80 Pro", "X80", "X70",
+    "iQOO 12 Pro", "iQOO 9 Pro",
+    "OnePlus 13", "OnePlus 12", "OnePlus 11", "OnePlus 10 Pro", "OnePlus 9 Pro", "OnePlus 8 Pro", "OnePlus 8",
+    "Pixel 9 Pro XL", "Pixel 9", "Pixel 8 Pro", "Pixel 8", "Pixel 7 Pro", "Pixel 7", "Pixel 6 Pro", "Pixel 6", "Pixel 5",
+    "Nothing Phone 1"
+  ],
+  "yellowCheck": [
+    "iPhone X", "iPhone 8 Plus", "iPhone 7 Plus", "iPhone 6S Plus",
+    "Mate 40E", "Mate 30E Pro", "Mate 20 Pro", "Mate 20", "Mate 10 Pro", "Mate 10", "Mate 9",
+    "P50E", "P20 Pro", "P20",
+    "Nova 9 Pro", "Nova 8 Pro", "Nova 8", "Nova 7 Pro", "Nova 7", "Nova 7 SE", "Nova 6", "Nova 5 Pro", "Nova 5", "Nova 4",
+    "畅享 20 Pro", "畅享 20e", "60", "50 SE", "50", "30 Pro", "30", "20 Pro", "20",
+    "Magic 4 Pro", "Magic 3 Pro", "Magic 2",
+    "Honor V40", "Honor V30 Pro", "Honor V30", "Honor V20", "Honor X30", "Honor X10", "Honor 9X", "Honor 8X",
+    "Galaxy S10+", "Galaxy S9+", "Galaxy S8+", "Galaxy Note 10+", "Galaxy Note10 Lite", "Galaxy Note 10", "Galaxy Note 9", "Galaxy Note 8",
+    "Galaxy A72", "Galaxy A71", "Galaxy A70", "Galaxy A52s 5G", "Galaxy A52", "Galaxy A51", "Galaxy A50", "Galaxy S20 FE", "Galaxy S21+",
+    "Mi 14 Ultra", "Mi 11T Pro", "Mi 11T", "Mi 10S", "Mi 10T Pro 5G", "Mi 10 Youth 5G", "Mi 9", "Mi 8", "MiX 4", "MiX 3", "MiX 2S", "MiX 2", "Mi CC9 Pro", "Mi CC9",
+    "Redmi K50 Pro", "Redmi K40 Pro+", "Redmi K40 Gaming", "Redmi K40", "Redmi K30 至尊纪念版", "Redmi K30 Ultra", "Redmi K30 Pro", "Redmi K30",
+    "Redmi Note 10 Pro", "Redmi Note 9 Pro", "Redmi Note 9S", "Redmi Note 9", "Redmi Note 8 Pro", "Redmi Note 8", "Redmi Note 7",
+    "Poco X3 Pro", "Poco X3 NFC", "Poco F3",
+    "Reno 12 Pro", "Reno 8", "Reno 7", "Reno 6 Pro", "Reno 6", "Reno 5 Pro", "Reno 5", "Reno 4 SE 5G", "Reno 3 Pro", "Reno 2", "Reno", "Reno ACE",
+    "Find X8 S", "Find X3", "Find X2 Pro", "Find X",
+    "R17 Pro", "R17", "R15", "R11 Plus",
+    "X200 Pro", "X200 Pro mini", "X70 Pro+", "X70 Pro", "X60 Pro", "X60", "X50 Pro", "X50", "X30 Pro", "X30",
+    "iQOO 10 Pro", "iQOO 9", "iQOO 8", "iQOO Neo 5",
+    "S12", "S10 Pro", "S10", "S9", "S5", "Nex 3S", "Nex S", "Z5X",
+    "OnePlus 9 RT", "OnePlus 8T", "OnePlus 7 Pro", "OnePlus 7T", "OnePlus 6T",
+    "Pixel 4XL", "Pixel 4", "Pixel 3 XL",
+    "Realme GT", "Realme X2 Pro", "Realme X2", "Realme X Master", "Realme 5", "Realme XT", "Realme Q3",
+    "G8X ThinQ", "V60 ThinQ"
+  ],
+  "yellowCross": [
+    "iPhone 8", "iPhone 7",
+    "Mate 极 Pro", "P30 lite", "P9", "10",
+    "Galaxy S10", "Galaxy S9", "Galaxy S8", "Galaxy S10e",
+    "X100 Ultra", "meizu 18"
+  ],
+redCross: [
+"iPhone 6S",
+"iPhone 6",
+"iPhone SE 2",
+"iPhone SE",
+"Mate 40 RS（porsche-design）",
+"Mate 20 X",
+"Mate X2",
+"Galaxy Z Fold3 5G",
+"Galaxy A53",
+"Mi 10 Ultra",
+"Redmi Note 11 Pro",
+"Reno 4 Pro",
+"X27",
+"Pixel 4A"
+]
+    },
+
+"Osmo Mobile 7/7P": {
+  greenCheck: [
+    "iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16 Plus", "iPhone 16", "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15", "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14 Plus", "iPhone 14", "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13 Mini", "iPhone 13", "iPhone 12 Pro Max", "iPhone 12 Pro", "iPhone 12", "iPhone 12 Mini", "iPhone 11 Pro Max", "iPhone 11 Pro", "iPhone 11", "iPhone XS Max", "iPhone XS", "iPhone XR", "Mate 70 Pro+", "Mate 70 RS 非凡大师", "Mate 70", "Mate 60 Pro+", "Mate 60 Pro", "Mate 60", "Mate 50 Pro", "Mate 50", "Mate 40 Pro+", "Mate 40 Pro", "Mate 40", "Mate 30 Pro", "Mate 30", "P70 Ultra", "P70 Pro", "P70", "P60 Pro", "P60", "P50 Pro", "P50", "P40 Pro+", "P40 Pro", "P40", "P30 Pro", "P30", "Nova 12 Pro", "Nova 10 Pro", "Nova 9", "300 Pro", "200 Pro", "100 Pro", "90 Pro", "80 Pro", "70 Pro", "60 Pro", "50 Pro", "Magic 7 Pro", "Magic 6 Pro", "Magic 5 Pro", "Magic 4", "Magic 3", "Galaxy S25 Ultra", "Galaxy S25+", "Galaxy S25", "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24", "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S22 Ultra", "Galaxy S22+", "Galaxy S22", "Galaxy S21 Ultra", "Galaxy S21", "Galaxy S20 Ultra", "Galaxy S20+", "Galaxy S20", "Galaxy Note 20 Ultra", "Galaxy Z Flip 4", "Mi 15 Ultra", "Mi 15 Pro", "Mi 15", "Mi 14 Ultra", "Mi 14 Pro", "Mi 14", "Mi 13 Ultra", "Mi 13 Pro", "Mi 12S Ultra", "Mi 12S Pro", "Mi 12S", "Mi 12 Pro", "Mi 12", "Mi 11 Pro", "Mi 11 Ultra", "Mi 11", "Mi 10 Pro", "Mi 10", "Redmi K70 Pro", "Redmi K70", "Redmi K60 Pro", "Redmi K40 Pro", "Reno 12 Pro", "Reno 11 Pro", "Reno 10 Pro", "Reno 9", "Reno 8 Pro", "Reno 7 Pro", "Reno 6 Pro+", "Find X8 Ultra", "Find X8 S+", "Find X8 Pro", "Find X8", "Find X7 Ultra", "Find X7", "Find X6 Pro", "Find X6", "Find X5 Pro", "Find X3 Pro", "X200 Pro", "X200 Pro mini", "X100 Ultra", "X100 Pro", "X90 Pro+", "X90 Pro", "X80 Pro", "X80", "X70", "iQOO 12 Pro", "iQOO 9 Pro", "OnePlus 13", "OnePlus 12", "OnePlus 11", "OnePlus 10 Pro", "OnePlus 9 Pro", "OnePlus 8 Pro", "OnePlus 8", "Pixel 9 Pro XL", "Pixel 9", "Pixel 8 Pro", "Pixel 8", "Pixel 7 Pro", "Pixel 7", "Pixel 6 Pro", "Pixel 6", "Pixel 5", "Nothing Phone 1"
+  ],
+  yellowCheck: [
+    "iPhone X", "iPhone 8 Plus", "iPhone 7 Plus", "iPhone 6S Plus", "Mate 40E", "Mate 30E Pro", "Mate 20 Pro", "Mate 20", "Mate 10 Pro", "Mate 10", "Mate 9", "P50E", "P20 Pro", "P20", "Nova 9 Pro", "Nova 8 Pro", "Nova 8", "Nova 7 Pro", "Nova 7", "Nova 7 SE", "Nova 6", "Nova 5 Pro", "Nova 5", "Nova 4", "畅享 20 Pro", "畅享 20e", "60", "50 SE", "50", "30 Pro", "30", "20 Pro", "20", "Magic 4 Pro", "Magic 3 Pro", "Magic 2", "Honor V40", "Honor V30 Pro", "Honor V30", "Honor V20", "Honor X30", "Honor X10", "Honor 9X", "Honor 8X", "Galaxy S10+", "Galaxy S9+", "Galaxy S8+", "Galaxy Note 10+", "Galaxy Note10 Lite", "Galaxy Note 10", "Galaxy Note 9", "Galaxy Note 8", "Galaxy A72", "Galaxy A71", "Galaxy A70", "Galaxy A52s 5G", "Galaxy A52", "Galaxy A51", "Galaxy A50", "Galaxy S20 FE", "Galaxy S21+", "Mi 11T Pro", "Mi 11T", "Mi 10S", "Mi 10T Pro 5G", "Mi 10 Youth 5G", "Mi 9", "Mi 8", "MiX 4", "MiX 3", "MiX 2S", "MiX 2", "Mi CC9 Pro", "Mi CC9", "Redmi K50 Pro", "Redmi K40 Pro+", "Redmi K40 Gaming", "Redmi K40", "Redmi K30 至尊纪念版", "Redmi K30 Ultra", "Redmi K30 Pro", "Redmi K30", "Redmi K20 Pro", "Redmi Note 10 Pro", "Redmi Note 9 Pro", "Redmi Note 9S", "Redmi Note 9", "Redmi Note 8 Pro", "Redmi Note 8", "Redmi Note 7", "Poco X3 Pro", "Poco X3 NFC", "Poco F3", "Reno 8", "Reno 7", "Reno 6 Pro", "Reno 6", "Reno 5 Pro", "Reno 5", "Reno 4 SE 5G", "Reno 3 Pro", "Reno 2", "Reno", "Reno ACE", "Find X8 S", "Find X3", "Find X2 Pro", "Find X", "R17 Pro", "R17", "R15", "R11 Plus", "X70 Pro+", "X70 Pro", "X60 Pro", "X60", "X50 Pro", "X50", "X30 Pro", "X30", "iQOO 10 Pro", "iQOO 9", "iQOO 8", "iQOO Neo 5", "S12", "S10 Pro", "S10", "S9", "S5", "Nex 3S", "Nex S", "Z5X", "OnePlus 9 RT", "OnePlus 8T", "OnePlus 7 Pro", "OnePlus 7T", "OnePlus 6T", "Pixel 4XL", "Pixel 4", "Pixel 3 XL", "Realme GT", "Realme X2 Pro", "Realme X2", "Realme X Master", "Realme 5", "Realme XT", "Realme Q3", "G8X ThinQ", "V60 ThinQ"
+  ],
+  yellowCross: [
+    "iPhone 8", "iPhone 7", "Mate 9 Pro", "P30 lite", "P9", "10", "Galaxy S10", "Galaxy S9", "Galaxy S8", "Galaxy S10e", "meizu 18"
+  ],
+  redCross: [
+    "iPhone 6S", "iPhone 6", "iPhone SE 2", "iPhone SE", "Mate 40 RS（porsche-design）", "Mate 20 X", "Mate X2", "Galaxy Z Fold3 5G", "Galaxy A53", "Mi 10 Ultra", "Redmi Note 11 Pro", "Reno 4 Pro", "X27", "Pixel 4A"
+        ],
+        note: "专为折叠屏和大屏设备设计"
+    }
+};
+
+        
+        const droneInput = document.getElementById('drone-input');
+        const brandSelect = document.getElementById('brand-select');
+        const phoneInput = document.getElementById('phone-input');
+        const searchBtn = document.getElementById('search-btn');
+        const resultContainer = document.getElementById('result-container');
+        const droneAutocomplete = document.getElementById('drone-autocomplete');
+        const phoneAutocomplete = document.getElementById('phone-autocomplete');
+        const compatibilityResult = document.getElementById('compatibility-result');
+        const compatibilityIcon = compatibilityResult.querySelector('.compatibility-icon');
+        const compatibilityText = compatibilityResult.querySelector('.compatibility-text');
+        const compatibilityDesc = compatibilityResult.querySelector('.compatibility-description');
+        const widthValue = document.getElementById('width-value');
+        const thicknessValue = document.getElementById('thickness-value');
+        const weightValue = document.getElementById('weight-value');
+        const clampValue = document.getElementById('clamp-value');
+        const notesContent = document.getElementById('notes-content');
+        
+
+        function initBrandSelect() {
+            brandSelect.innerHTML = '<option value="">-- 请选择手机品牌 --</option>';
+            Object.keys(phoneModels).forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand;
+                option.textContent = brand;
+                brandSelect.appendChild(option);
+            });
+        }
+        
+
+        function setupAutocomplete(input, container, items) {
+            input.addEventListener('input', function() {
+                const value = this.value.toLowerCase();
+                container.innerHTML = '';
+                
+                if (!value) {
+                    container.style.display = 'none';
+                    return;
+                }
+                
+                const filteredItems = items.filter(item => 
+                    item.toLowerCase().includes(value)
+                );
+                
+                if (filteredItems.length === 0) {
+                    container.style.display = 'none';
+                    return;
+                }
+                
+                filteredItems.slice(0, 8).forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.classList.add('autocomplete-item');
+                    itemElement.textContent = item;
+                    itemElement.addEventListener('click', () => {
+                        input.value = item;
+                        container.style.display = 'none';
+                    });
+                    container.appendChild(itemElement);
+                });
+                
+                container.style.display = 'block';
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!container.contains(e.target) && e.target !== input) {
+                    container.style.display = 'none';
+                }
+            });
+        }
+        
+        
+const scriptTemplates = {
+    "green-check": {
+        script1: "您好，您的手机是在官网《手机兼容列表》中的，经过工程师的适配兼容后，可获得最佳的使用体验。"
+    },
+
+    "yellow-check": {
+        script1: `1、很抱歉给您带来的困扰，您的手机尺寸和重量满足云台的硬件要求，当您手机正常连接上 DJI 设备的蓝牙后，在搭配原生相机或三方相机类 App 可以实现云台拍摄时的增稳。云台的硬件功能，如通过摇杆调整云台角度、云台回中等功能可以正常使用。
+<br>
+2、但 DJI Mimo 未对您的手机进行专门的软件测试适配。在搭配 DJI Mimo 使用时，可能会出现未知问题，影响您的使用体验。
+如果您要使用的话，建议搭配您的原生相机，效果相对会好一些。
+<br>
+（可灵活结合【DJI OM 系列手机兼容性查询列表】的"备注"列解释原因）`,
+        script2: `1、您可以先下载 DJI Mimo App ，点击「相机图标-连接帮助-Osmo Mobile 系列-进入相机」进入拍摄页面，可以查看到当前手机型号可以支持的拍摄功能，也可以进行拍摄等相机功能测试，确认是否可以正常使用。
+<br>
+2、如果您日常生活或工作上有云台使用需求，且搭配云台使用的过程中，可以切换原生相机或第三方相机类 App 使用，可以购买该产品；<br>
+3、如果您周边有线下实体店，建议您先到店内实机测试确认，若使用效果能达到您的预期，您可以购买这款产品，感谢您的理解与支持。<br>
+4、您也可以现在下单购买，待拿到 DJI 设备后搭配您的手机进行兼容测试，若产品表现不符合您的预期，在产品签收的7个自然日内，保证产品符合外包装良好、配件齐全等不影响第二次销售的情况下，可以申请退换货的哦。
+<br>
+*京东渠道请勿引导线下`,
+        script3: "请您放心，我们会将您的手机型号反馈至工程师，同时会在后续的软件兼容适配中会优先对您的手机做兼容性确认与适配，但该过程需要较长时间，短期内无法给到确切答复，若后续确认兼容，将会在手机兼容列表内新增该机型，请您留意官网《手机兼容列表》的更新。"
+    },
+
+    "yellow-cross": {
+        script1: `1、很抱歉给您带来的困扰，您的手机尺寸和重量不符合云台的负载值，未满足硬件兼容要求。而云台的兼容范围有一定冗余，可以勉强使用。
+<br>
+2、但 DJI Mimo 未对该手机进行专门的软件测试适配。您的手机在搭配 DJI Mimo 使用时，可能会出现未知问题，影响您的使用体验。
+<br>
+（可巧妙结合【DJI OM 系列手机兼容性查询列表】的"备注"列解释原因）`,
+        script2: `1、由于云台的搭载范围有一定冗余，可以勉强使用。如果您周边有线下实体店，建议您先到店内实机测试确认，若使用效果能达到您的预期，您可以购买这款产品，感谢您的理解与支持。
+<br>
+2、您也可以现在下单购买，待拿到 DJI 设备后搭配您的手机进行兼容测试，若产品表现不符合您的预期，在产品签收的7个自然日内，保证产品符合外包装良好、配件齐全等不影响第二次销售的情况下，可以申请退换货的哦。
+<br>
+*京东渠道请勿引导线下`,
+        script3: "请您放心，我们会将您的手机型号反馈至工程师，同时会在后续的软件兼容适配中会优先对您的手机做兼容性确认与适配，但该过程需要较长时间，短期内无法给到确切答复，若后续确认兼容，将会在手机兼容列表内新增该机型，请您留意官网《手机兼容列表》的更新。"
+    },
+
+    "red-cross": {
+        script1: `手机手机太重/厚/轻/宽等<br><br>
+1、很抱歉给您带来的困扰，您的手机尺寸和重量不符合云台的负载值，手机手机太重/太厚/太轻/太宽（依据备注选择），可能会对云台增稳效果造成一定影响。
+<br>
+2、同时DJI Mimo 也未对该手机专门进行的软件测试适配。在搭配 DJI Mimo 使用时，可能会出现未知问题，影响您的使用体验。
+微云台
+<br>
+(仅涉及Vivo X60 Pro/ X60/ X50 Pro等三个机型):<br>
+1. 由于手机搭载了微云台技术，和我们云台增稳以及跟随功能存在冲突，所以不推荐搭配您的手机使用。
+<br>
+2、同时 DJI Mimo 也未对该手机专门进行的软件测试适配。在搭配 DJI Mimo 使用时，软件兼容性的主要影响也无法保证，可能会出现未知问题，影响您的使用体验。
+<br>
+系统兼容性较差
+<br>
+（仅涉及极少部分机型）<br>
+1、很抱歉给您带来的困扰，但经过工程师的兼容测试适配，您的手机和 DJI Mimo 的系统兼容性较差。
+<br>
+2、在搭配 DJI Mimo 使用时，软件兼容性的主要影响无法保证，可能会出现未知问题，影响您的使用体验。`,
+        script2: `手机手机太重/厚/轻/宽等:<br>
+若您已购买云台设备，不推荐搭配当前的手机使用，您可以更换其他兼容手机搭配云台进行使用<br>
+微云台<br>
+<br>
+(仅涉及Vivo X60 Pro/ X60/ X50 Pro等三个机型):<br>
+1、若您已购买云台设备，不推荐搭配当前的手机使用，您可以更换其他兼容手机搭配云台进行使用。
+<br>
+2、如您还未购买云台，建议您选购 Osmo Mobile 6，该云台已对 搭载微云台的手机已进行过适配优化，可满足正常使用需求。
+<br>
+3、如您已购买 OM 3/4 系列，由于微云台的影响，可能会对云台增稳有一定影响，请您提供相关信息，以便反馈工程师作进一步确认，以便为您核实对应的使用建议或解决方案，感谢您的理解与支持。按照下方【信息收集】进行收集。
+系统兼容性较差
+<br>
+（仅涉及极少部分机型）<br>
+若您已购买云台设备，不推荐搭配当前的手机使用，您可以更换其他兼容手机搭配云台进行使用。`,
+        script3: `手机手机太重/厚/轻/宽等:<br>
+请您放心，我们会将您的手机型号反馈至工程师参考，以作为后续产品开发的主要参考对象，再次感谢您对我们产品的支持及建议，感谢您的理解与支持。<br>
+微云台<br>
+<br>
+(仅涉及Vivo X60 Pro/ X60/ X50 Pro等三个机型):<br>
+请您放心，我们会将您的手机型号反馈至工程师参考，将该型号纳入 DJI Mimo 的兼容适配工作，再次感谢您对我们产品的支持及建议，感谢您的理解与支持。<br>
+系统兼容性较差<br>
+
+（仅涉及极少部分机型）<br>
+请您放心，我们会将您的手机型号反馈至工程师参考，将该型号纳入 DJI Mimo 的兼容适配工作，再次感谢您对我们产品的支持及建议，感谢您的理解与支持。`
+    }
+};
+
+// 修改checkCompatibility函数中的兼容性判断逻辑
+function checkCompatibility() {
+    const drone = droneInput.value.trim();
+    const brand = brandSelect.value;
+    const phone = phoneInput.value.trim();
+    
+    if (!drone || !brand || !phone) {
+        alert('请填写所有查询信息');
+        return;
+    }
+    
+
+    resultContainer.style.display = 'block';
+    
+
+    if (droneParameters[drone]) {
+        const params = droneParameters[drone];
+        widthValue.textContent = params.width;
+        thicknessValue.textContent = params.thickness;
+        weightValue.textContent = params.weight;
+        clampValue.textContent = params.clamp;
+        notesContent.textContent = params.note;
+        document.getElementById('parameters-container').style.display = 'block';
+    }
+    
+
+    let statusClass = '';
+    let icon = '';
+    let text = '';
+    let desc = '';
+    let scriptType = '';
+    
+    if (compatibilityData[drone]) {
+        const data = compatibilityData[drone];
+        
+        if (data.greenCheck.includes(phone)) {
+            // 绿色勾 - 完全适配
+            statusClass = 'green-check';
+            icon = '✅';
+            text = '完全适配';
+            desc = '该手机已在兼容列表内，所有功能均可正常使用';
+            scriptType = 'green-check';
+        } else if (data.yellowCheck.includes(phone)) {
+            // 黄色勾 - 基本兼容
+            statusClass = 'yellow-check';
+            icon = '⚠️';
+            text = '基本兼容';
+            desc = '该手机基本兼容，部分高级功能可能受限';
+            scriptType = 'yellow-check';
+        } else if (data.yellowCross.includes(phone)) {
+            // 黄色叉 - 未测试
+            statusClass = 'yellow-cross';
+            icon = '❓';
+            text = '未测试';
+            desc = '该手机不在测试列表内，兼容性未经验证';
+            scriptType = 'yellow-cross';
+        } else if (data.redCross.includes(phone)) {
+            // 红色叉 - 不适配
+            statusClass = 'red-cross';
+            icon = '❌';
+            text = '不适配';
+            desc = '该手机由于硬件限制，不推荐使用';
+            scriptType = 'red-cross';
+        } else {
+
+            statusClass = 'yellow-cross';
+            icon = '❓';
+            text = '未测试';
+            desc = '该手机不在兼容列表内，请参考硬件参数判断';
+            scriptType = 'yellow-cross';
+        }
+    } else {
+
+        statusClass = 'yellow-cross';
+        icon = '❓';
+        text = '数据缺失';
+        desc = '该云台型号兼容性数据有限，请参考硬件参数';
+        scriptType = 'yellow-cross';
+    }
+    
+
+    compatibilityResult.className = 'compatibility-result ' + statusClass;
+    compatibilityIcon.textContent = icon;
+    compatibilityText.textContent = text;
+    compatibilityDesc.textContent = desc;
+    
+
+    updateScripts(scriptType);
+    document.getElementById('scripts-container').style.display = 'block';
+    
+
+    resultContainer.scrollIntoView({ behavior: 'smooth' });
+}
+
+
+function updateScripts(scriptType) {
+    const scripts = scriptTemplates[scriptType];
+    if (scripts) {
+        // 使用 innerHTML 替代 textContent 以支持 HTML 标签
+        document.getElementById('script1-content').innerHTML = scripts.script1;
+        document.getElementById('script2-content').innerHTML = scripts.script2 || '';
+        document.getElementById('script3-content').innerHTML = scripts.script3 || '';
+        
+
+        document.getElementById('script2').parentElement.style.display = scripts.script2 ? 'block' : 'none';
+        document.getElementById('script3').parentElement.style.display = scripts.script3 ? 'block' : 'none';
+    }
+}
+
+
+// 兼容型复制函数
+function copyTextToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        // 优先使用 Clipboard API
+        return navigator.clipboard.writeText(text).catch(err => {
+            console.warn('Clipboard API 被拒绝，使用降级方案', err);
+            fallbackCopyTextToClipboard(text);
+        });
+    } else {
+        // 非 HTTPS 或 API 不支持，直接用降级方案
+        fallbackCopyTextToClipboard(text);
+        return Promise.resolve();
+    }
+}
+
+// 降级方案（execCommand）
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed"; // 避免页面滚动
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        document.execCommand('copy');
+    } catch (err) {
+        console.error('execCommand 复制失败', err);
+    }
+    document.body.removeChild(textArea);
+}
+
+function copyParameters() {
+    const params = [];
+    params.push(`手机宽度: ${document.getElementById('width-value').textContent}`);
+    params.push(`手机厚度: ${document.getElementById('thickness-value').textContent}`);
+    params.push(`手机重量: ${document.getElementById('weight-value').textContent}`);
+    params.push(`夹持范围: ${document.getElementById('clamp-value').textContent}`);
+    const paramText = params.join('\n');
+
+    copyTextToClipboard(paramText)
+        .then(() => {
+            const btn = document.getElementById('copy-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '已复制!';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 2000);
+        });
+}
+
+function copyScript(contentId) {
+    const contentElement = document.getElementById(contentId);
+    const content = contentElement.innerText || contentElement.textContent;
+
+    copyTextToClipboard(content)
+        .then(() => {
+            const btn = document.querySelector(`button[onclick="copyScript('${contentId}')"]`);
+            if (btn) {
+                const originalText = btn.textContent;
+                btn.textContent = '已复制!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }
+        });
+}
+        
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initBrandSelect();
+            setupAutocomplete(droneInput, droneAutocomplete, droneModels);
+            
+
+            searchBtn.addEventListener('click', checkCompatibility);
+            
+
+            droneInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkCompatibility();
+            });
+            
+brandSelect.addEventListener('change', function() {
+    const brand = this.value;
+    if (brand && phoneModels[brand]) {
+        setupAutocomplete(phoneInput, phoneAutocomplete, phoneModels[brand]); 
+    } else {
+        phoneInput.value = '';
+        phoneAutocomplete.style.display = 'none';
+    }
+});
+            
+            phoneInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') checkCompatibility();
+            });
+        });
+    </script>
+</body>
+</html>
